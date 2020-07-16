@@ -10,7 +10,8 @@ const userSchema = new mongoose.Schema({
   plans: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Plan',
+      ref: 'UserPlan',
+      autopopulate: true,
     },
   ],
   resetPasswordToken: String,
@@ -20,4 +21,5 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.plugin(passportLocalMongoose);
+userSchema.plugin(require('mongoose-autopopulate'));
 module.exports = mongoose.model('User', userSchema);

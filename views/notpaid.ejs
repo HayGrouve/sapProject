@@ -1,0 +1,13 @@
+<%- include("./partials/navbar") %>
+
+<ul class="list-group">
+    <% users.forEach(user=>{ %>
+        <%user.plans.forEach(plan=>{ %>
+            <% if(!(plan.isPaid)){ %>
+            <li class="list-group-item">Plan: <%= plan.title %> - <a href="/user/<%= user.id %>/edit"><i class="fas fa-user"></i> <%= user.username %></a></li>
+            <% } %>
+        <% }) %>
+    <% }) %> 
+</ul>
+
+<%- include("./partials/footer") %>

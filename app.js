@@ -1,3 +1,5 @@
+const { checkUsername } = require('./middleware/index');
+
 const express = require('express'),
   app = express(),
   bodyParser = require('body-parser'),
@@ -10,6 +12,7 @@ const express = require('express'),
   crypto = require('crypto'),
   User = require('./models/user'),
   Plan = require('./models/plan'),
+  UserPlan = require('./models/userPlans'),
   middleware = require('./middleware/index'),
   methodOverride = require('method-override');
 require('dotenv').config();
@@ -188,6 +191,44 @@ app.get('/application', (req, res) => {
           if (err || !foundPlans) {
             console.error(err);
           } else {
+            if (req.user && req.user != 'undefined') {
+              req.user.plans.forEach((plan) => {
+                if (!plan.isPaid) {
+                  UserPlan.findOne({ _id: plan._id }, (err, foundPlan) => {
+                    if (err || !foundPlan) {
+                      console.error(err);
+                    } else {
+                      User.findOne({ _id: req.user._id }, (err, foundUser) => {
+                        if (err || !foundUser) {
+                          console.error(err);
+                        } else {
+                          foundUser.plans.pull(foundPlan);
+                          foundUser.save((err, data) => {
+                            if (err || !foundUser) {
+                              console.error(err);
+                            } else {
+                              UserPlan.findOneAndDelete(
+                                { _id: plan._id },
+                                (err, deleted) => {
+                                  if (err || !foundUser) {
+                                    console.error(err);
+                                  } else {
+                                    res.render('application', {
+                                      users: foundUsers,
+                                      plans: foundPlans,
+                                    });
+                                  }
+                                }
+                              );
+                            }
+                          });
+                        }
+                      });
+                    }
+                  });
+                }
+              });
+            }
             res.render('application', { users: foundUsers, plans: foundPlans });
           }
         });
@@ -218,7 +259,7 @@ app.get('/user/:id/edit', middleware.isLoggedIn, (req, res) => {
                   console.error(err);
                 } else {
                   res.render('profile', {
-                    user: foundUser,
+                    user: user,
                     plans: foundPlans,
                     users: foundUsers,
                   });
@@ -374,11 +415,10 @@ app.delete('/plan/:id', middleware.isAdmin, (req, res) => {
 
 //ADD PLAN TO USER
 app.post('/plan/adduser', middleware.isEmployee, (req, res) => {
-  Plan.findOne(req.body.plan, (err, foundPlan) => {
-    if (err || !foundPlan) {
+  UserPlan.create(req.body.plan, (err, newPlan) => {
+    if (err) {
       console.error(err);
-      req.flash('error', 'Plan not found!');
-      res.redirect('back');
+      res.redirect('/application');
     } else {
       User.findOne({ email: req.body.addTargetUserEmail }, (err, foundUser) => {
         if (err || !foundUser) {
@@ -386,19 +426,22 @@ app.post('/plan/adduser', middleware.isEmployee, (req, res) => {
           req.flash('error', 'User not found!');
           res.redirect('back');
         } else {
-          foundPlan.users.push(foundUser);
-          foundUser.plans.push(foundPlan);
-          foundPlan.save((err, planData) => {
+          newPlan.user = foundUser._id;
+          foundUser.plans.push(newPlan);
+          newPlan.save((err, planData) => {
             if (err) {
               console.error(err);
+              req.flash('error', `User is on this plan already!`);
+              res.redirect('/application');
             } else {
               foundUser.save((err, userData) => {
                 if (err) {
                   console.error(err);
+                  res.redirect('/application');
                 } else {
                   req.flash(
                     'success',
-                    `${foundPlan.title} added to ${foundUser.username}`
+                    `${newPlan.title} added to ${foundUser.username}`
                   );
                   res.redirect('back');
                 }
@@ -411,44 +454,116 @@ app.post('/plan/adduser', middleware.isEmployee, (req, res) => {
   });
 });
 
-//PLAN REMOVE FROM USER
-app.post('/plan/rmuser', middleware.isEmployee, (req, res) => {
-  Plan.findOne(req.body.plan, (err, foundPlan) => {
+//SHOW USER PLANS
+app.get('/user/:userid/plan/:id/show', middleware.isLoggedIn, (req, res) => {
+  UserPlan.findById(req.params.id, (err, foundPlan) => {
     if (err || !foundPlan) {
-      console.error(err);
       req.flash('error', 'Plan not found!');
       res.redirect('back');
     } else {
-      User.findOne(
-        { email: req.body.removeTargetUserEmail },
-        (err, foundUser) => {
-          if (err || !foundUser) {
-            console.error(err);
-            req.flash('error', 'User not found!');
-            res.redirect('back');
-          } else {
-            foundPlan.users.pull(foundUser);
-            foundUser.plans.pull(foundPlan);
-            foundPlan.save((err, planData) => {
-              if (err) {
-                console.error(err);
-              } else {
-                foundUser.save((err, userData) => {
-                  if (err) {
+      Plan.find({}, (err, foundPlans) => {
+        if (err || !foundPlans) {
+          req.flash('error', 'Plans not found!');
+          res.redirect('/application');
+        } else {
+          User.find({}, (err, foundUsers) => {
+            if (err || !foundUsers) {
+              console.error(err);
+            } else {
+              User.findOne({ _id: req.params.userid }, (err, foundUser) => {
+                if (err || !foundUsers) {
+                  console.error(err);
+                } else {
+                  res.render('show', {
+                    plan: foundPlan,
+                    plans: foundPlans,
+                    users: foundUsers,
+                    user: foundUser,
+                  });
+                }
+              });
+            }
+          });
+        }
+      });
+    }
+  });
+});
+
+//DELETE USER PLAN
+app.post('/user/:userid/plan/:id/show', middleware.isEmployee, (req, res) => {
+  UserPlan.findOne({ _id: req.params.id }, (err, foundPlan) => {
+    if (err || !foundPlan) {
+      console.error(err);
+    } else {
+      User.findOne({ _id: req.params.userid }, (err, foundUser) => {
+        if (err || !foundUser) {
+          console.error(err);
+        } else {
+          foundUser.plans.pull(foundPlan);
+          foundUser.save((err, data) => {
+            if (err || !foundUser) {
+              console.error(err);
+            } else {
+              UserPlan.findOneAndDelete(
+                { _id: req.params.id },
+                (err, deleted) => {
+                  if (err || !foundUser) {
                     console.error(err);
                   } else {
-                    req.flash(
-                      'success',
-                      `${foundPlan.title} removed from ${foundUser.username}`
-                    );
-                    res.redirect('back');
+                    req.flash('success', 'Plan deleted!');
+                    res.redirect('/application');
                   }
-                });
-              }
-            });
-          }
+                }
+              );
+            }
+          });
         }
-      );
+      });
+    }
+  });
+});
+
+//PAY PLAN
+app.post('/pay/:id', middleware.isEmployee, (req, res) => {
+  UserPlan.findByIdAndUpdate(
+    req.params.id,
+    req.body.plan,
+    { useFindAndModify: false },
+    (err, updatedPlan) => {
+      if (err || !updatedPlan) {
+        req.flash('error', 'Plan not found!');
+        res.redirect('/application');
+      } else {
+        req.flash('success', 'Plan paid!');
+        res.redirect('/application');
+      }
+    }
+  );
+});
+
+//NOT PAID
+app.get('/notpaid', middleware.isLoggedIn, (req, res) => {
+  User.find({}, (err, foundUsers) => {
+    if (err) {
+      console.error(err);
+    } else {
+      Plan.find({}, (err, foundPlans) => {
+        if (err) {
+          console.error(err);
+        } else {
+          UserPlan.find({}, (err, foundUserPlans) => {
+            if (err) {
+              console.error(err);
+            } else {
+              res.render('notpaid', {
+                users: foundUsers,
+                plans: foundPlans,
+              });
+            }
+          });
+        }
+      });
     }
   });
 });

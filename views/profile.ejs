@@ -39,15 +39,14 @@
   <div class="col-6">
     <div class="form-container">
       <h3><%= user.firstname %>'s plans</h3>
-      <div class="dropdown">
-        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-         Show plans
-        </button>
-        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-          <% user.plans.forEach(plan => { %>
-            <a class="dropdown-item" href="/plan/<%= plan.id %>/edit"><%=plan.title%></a>
-          <% }); %>
-        </div>
+      <% if(user.plans.length < 1) {%>
+      <p>No plans yet</p>
+      <% } %>
+      <ul class="list-group">
+        <% user.plans.forEach(plan => { %>
+        <li class="list-group-item"><a href="plan/<%= plan.id %>/show"><%=plan.title%></a></li>
+        <% }); %>
+      </ul> 
       </div>
     </div>
   </div>

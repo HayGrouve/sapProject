@@ -44,20 +44,11 @@
                             </select>
                     </div>
                     <input type="hidden" name="addTargetUserEmail" id="add">
+                    <input type="hidden" name="plan[title]" id="title" value="<%= plan.title %>" >
+                    <input type="hidden" name="plan[minutes]" id="minutes" value="<%= plan.minutes %>" >
+                    <input type="hidden" name="plan[data]" id="data" value="<%= plan.data %>" >
+                    <input type="hidden" name="plan[sms]" id="sms" value="<%= plan.sms %>" >
                     <button type="submit" class="btn btn-success"><i class="fas fa-plus"></i> Add</button>
-                </form>
-                <form action="/plan/rmuser" method="POST" class="mt-5">
-                    <div class="form-group">
-                        <label for="removeFromUser"><h3>Remove from user</h3></label>
-                            <select class="form-control" id="removeFromUser" onchange="myFunction1()">
-                                <option>Select</option>
-                                    <% plan.users.forEach(user => { %>
-                                        <option><%= user.email %></option>
-                                    <% }); %>
-                            </select>
-                    </div>
-                    <input type="hidden" name="removeTargetUserEmail" id="remove">
-                    <button type="submit" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Remove</button>
                 </form>
         </div>
     </div>
