@@ -1,0 +1,23 @@
+<%- include("./partials/navbar") %>
+<div class="form-container">
+    <form action="/plan/new" method="POST">
+        <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" class="form-control" name="plan[title]" id="title" placeholder="Internet XL" required>
+          </div>
+        <div class="form-group">
+            <label for="minutes">Minutes</label>
+            <input type="number" class="form-control" name="plan[minutes]" id="minutes" placeholder="500" >
+          </div>
+        <div class="form-group">
+            <label for="data">Data</label>
+            <input type="number" class="form-control" name="plan[data]" id="data" placeholder="1000" required>
+        </div>
+        <div class="form-group">
+          <label for="sms">SMS</label>
+          <input type="number" class="form-control" name="plan[sms]" id="sms" placeholder="100" >
+        </div>
+        <button type="submit" class="btn btn-danger"><i class="fas fa-plus"></i> Create</button>
+      </form>
+</div>
+<%- include("./partials/footer") %>

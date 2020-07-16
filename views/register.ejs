@@ -1,0 +1,30 @@
+<%- include("./partials/header") %>
+<h1 class="mt-5 display-3 text-center font-weight-bolder"><a href="/application" class="brand"><i class="fab fa-redhat text-danger"></i>RedTell</a></h1>
+<h3 class="text-center mt-5">Sign Up</h3>
+<div class="form-container">
+    <form action="/register" method="POST">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" class="form-control" name="username" id="username" placeholder="MegaKiller77" required>
+          </div>
+        <div class="form-group">
+            <label for="firstName">First Name</label>
+            <input type="text" class="form-control" name="firstName" id="firstName" placeholder="John" required>
+          </div>
+        <div class="form-group">
+            <label for="lastName">Last Name</label>
+            <input type="text" class="form-control" name="lastName" id="lastName" placeholder="Doe" required>
+        </div>
+        <div class="form-group">
+          <label for="email">Email address</label>
+          <input type="email" class="form-control" name="email" id="email" aria-describedby="emailHelp" placeholder="example@domain.com" required>
+          <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" class="form-control" name="password" id="password" placeholder="password" required>
+        </div>
+        <button type="submit" class="btn btn-danger"><i class="fas fa-user-plus"></i> Sign Up</button>
+      </form>
+</div>
+<%- include("./partials/footer") %>

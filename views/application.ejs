@@ -1,0 +1,27 @@
+<%- include("./partials/navbar") %>
+    <% if(!currentUser) {%>
+        <h1 class="mt-5 display-3 text-center font-weight-bolder">Welcome to <i class="fab fa-redhat text-danger"></i>RedTell</h1>
+        <p class="d-5 text-center mt-5">Please login or sign up to view your profile!</p>
+    <% }else if(typeof page !== 'undefined' && page === 'searchUser'){ %>
+          <ul class="list-group">
+                <% searchUsers.forEach(user =>{ %>
+                    <li class="list-group-item"><a href="/user/<%= user.id %>/edit"><i class="fas fa-user"></i> <%= user.username %></a></li>
+                <% }); %>
+          </ul>
+    <% } else if(typeof page !== 'undefined' && page === 'searchPlan'){ %>
+        <ul class="list-group">
+            <% searchPlans.forEach(plan =>{ %>
+                <li class="list-group-item"><a href="/plan/<%= plan.id %>/edit"><i class="fas fa-phone"></i> <%=plan.title%></a></li>
+            <% }); %>
+        </ul>
+    <% } else {%>
+        <div class="jumbotron">
+            <h1 class="display-4">Hello, <%= currentUser.firstname %>!</h1>
+            <p class="lead">We are pleased that you are part of RedTell Bulgaria. Enjoy life and share your moments with friends via our global network!</p>
+            <hr class="my-4">
+            <p>You can check the plans you have here:</p>
+            <a class="btn btn-danger btn-lg" href="/user/<%= currentUser.id %>/edit" role="button"><i class="fas fa-user"></i> Profile</a>
+            <p class="mt-3">Or take a look at all plans from the navbar at the top of the page.</p>
+          </div>
+    <% } %>
+<%- include("./partials/footer") %>

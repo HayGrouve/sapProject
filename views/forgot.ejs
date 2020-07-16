@@ -1,0 +1,15 @@
+<%- include("./partials/header") %>
+<h1 class="mt-5 display-3 text-center font-weight-bolder"><a href="/application" class="brand"><i class="fab fa-redhat text-danger"></i>RedTell</a></h1>
+<div class="reset-forgot-wraper">
+    <h2 class="text-center mb-3">Forgot Password</h2>
+        <form action="/forgot" method="POST">
+            <div class="form-group">
+                <input type="email" name="email" autofocus class="form-control" placeholder="Email">
+            </div>
+            <div class="form-group">
+                <input type="submit" class="btn btn-danger" value="Reset Password">
+            </div>
+        </form>
+        <a href="/"><i class="fas fa-caret-left"></i> Go Back</a>
+    </div>
+<%- include("./partials/footer") %>

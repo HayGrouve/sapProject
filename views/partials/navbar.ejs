@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <!-- Latest compiled and minified CSS -->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+      integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="/stylesheets/fontawesome/css/all.css" />
+    <link rel="stylesheet" href="/stylesheets/main.css" />
+    <title>RedTell</title>
+  </head>
+
+  <body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light py-3">
+    <div class="container">
+        <a href="/application" class="navbar-brand brand"><i class="fab fa-redhat text-danger"></i>RedTell</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+      
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Plans
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <% plans.forEach(plan => { %>
+                      <a class="dropdown-item" href="/plan/<%= plan.id %>/edit"><%=plan.title%></a>
+                  <% }); %>
+                  <% if(currentUser && currentUser.isEmployee) {%>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="/plan/new">Create plan</a>
+                  <% } %>
+                </div>
+              </li>
+            <% if(currentUser && currentUser.isAdmin) {%>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Employees
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <% users.forEach(user => { %>
+                  <% if(user.isEmployee) {%>
+                    <a class="dropdown-item" href="/user/<%= user.id %>/edit"><%=user.username%></a>
+                  <% } %>
+                <% }); %>
+              </div>
+            </li>
+            <% } %>
+            <% if(currentUser && currentUser.isEmployee || currentUser && currentUser.isAdmin) {%>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Users
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <% users.forEach(user => { %>
+                  <% if(!user.isEmployee) {%>
+                    <a class="dropdown-item" href="/user/<%= user.id %>/edit"><%=user.username%></a>
+                  <% } %>
+                <% }); %>
+              </div>
+            </li>
+              <form action="/application" method="GET" class="form-inline ml-3">
+                <div class="form-group input-group-sm">
+                    <input type="text" name="searchUser" placeholder="User search..." class="form-control">
+                </div>
+                <div class="form-group">
+                    <button class="ml-2 btn btn-outline-primary btn-sm"><i class="fas fa-search"></i> User</button>
+                </div>
+              </form>
+              <form action="/application" method="GET" class="form-inline ml-3">
+                <div class="form-group input-group-sm">
+                    <input type="text" name="searchPlan" placeholder="Plan search..." class="form-control">
+                </div>
+                <div class="form-group">
+                    <button class="ml-2 btn btn-outline-primary btn-sm"><i class="fas fa-search"></i> Plan</button>
+                </div>
+              </form>
+          <% } %>
+          </ul>
+          <div>
+            <% if(!currentUser){ %>
+                <a href="/" class="btn btn-outline-danger my-2 my-sm-0">Login</a>
+                <a href="/register" class="btn btn-outline-danger my-2 my-sm-0">Sign Up</a>
+                <% } %>
+                <% if(currentUser){ %>
+                <span><a href="/user/<%= currentUser.id %>/edit"><i class="fas fa-user"></i> <%= currentUser.username %></a></span>
+                <a href="/logout" class="btn btn-outline-danger ml-3 my-2 my-sm-0">Logout</a>
+                <% } %>
+          </div>
+        </div>
+    </div>
+  </nav>
+  <div class="container">
+  <div class="container flash">
+    <% if(error && error.length > 0){ %>
+    <div class="alert alert-danger" role="alert">
+        <%= error %>
+    </div>
+    <% } %>
+
+    <% if(success && success.length > 0){ %>
+    <div class="alert alert-success" role="alert">
+        <%= success %>
+    </div>
+    <% } %>
+</div>
