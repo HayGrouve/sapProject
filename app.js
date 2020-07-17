@@ -5,6 +5,7 @@ const express = require('express'),
   bodyParser = require('body-parser'),
   mongoose = require('mongoose'),
   passport = require('passport'),
+  // session = require('cookie-session'),
   flash = require('connect-flash'),
   localStrategy = require('passport-local'),
   async = require('async'),
@@ -41,7 +42,7 @@ app.use(flash());
 
 //PASSPORT CONFIG
 app.use(
-  require('express-session')({
+  require('cookie-session')({
     secret: 'note',
     resave: false,
     saveUninitialized: false,
@@ -50,7 +51,6 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new localStrategy(User.authenticate()));
-
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
